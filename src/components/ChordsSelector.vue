@@ -77,6 +77,7 @@ const intervals = {
   // TODO: add intervals larger than one octave
 };
 
+// eslint-disable-next-line no-unused-vars
 function BuildChord(start_note, start_accidental, intervals) {
   let cur_degree = 1;
   let cur_distance = -start_accidental.distance;
@@ -204,6 +205,7 @@ let chord_types_tree = {
   ],
 };
 
+// eslint-disable-next-line no-unused-vars
 function PrintChord(chord) {
   let notes = [];
   for (let n of chord) {
