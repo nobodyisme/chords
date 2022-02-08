@@ -1,5 +1,5 @@
 <template>
-  <div></div>
+  <div class="play-conf-box"></div>
 </template>
 
 <script>

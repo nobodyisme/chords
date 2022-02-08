@@ -1,60 +1,73 @@
 <template>
-  <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
-    <v-main>
-      <HelloWorld/>
-    </v-main>
-  </v-app>
+  <div class="app">
+    <play-box :chord="chord" />
+    <div class="chords-conf-box">
+      <ul>
+        <li>one</li>
+        <li>two</li>
+        <li>three</li>
+      </ul>
+    </div>
+    <play-conf-box @change-chord="onChangeChord" />
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+import PlayBox from "./components/PlayBox.vue";
+import PlayConfBox from "./components/PlayConfBox.vue";
 
 export default {
-  name: 'App',
+  name: "App",
 
   components: {
-    HelloWorld,
+    PlayBox,
+    PlayConfBox,
   },
 
   data: () => ({
-    //
+    chord: "some chord",
   }),
+
+  methods: {
+    onChangeChord(newChord) {
+      this.chord = newChord;
+    },
+  },
 };
 </script>
+
+<style scoped>
+* {
+  border: 0;
+  margin: 0;
+}
+
+body {
+  font-family: "Helvetica", "Arial", serif;
+}
+
+.app {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+
+  grid-template-areas:
+    "main"
+    "conf1"
+    "conf2";
+}
+
+@media (min-width: 1000px) {
+  .app {
+    grid-template-columns: auto 20rem;
+    grid-template-areas:
+      "main conf1"
+      "main conf2";
+  }
+}
+
+.chords-conf-box {
+  grid-area: conf1;
+  background-color: hotpink;
+}
+</style>
