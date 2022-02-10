@@ -1,15 +1,17 @@
 <template>
-  <div class="app">
-    <play-box :chord="chord" />
-    <div class="chords-conf-box">
-      <ul>
-        <li>one</li>
-        <li>two</li>
-        <li>three</li>
-      </ul>
+  <v-app>
+    <div class="app">
+      <play-box :chord="chord" />
+      <div class="chords-conf-box">
+        <ul>
+          <li>one</li>
+          <li>two</li>
+          <li>three</li>
+        </ul>
+      </div>
+      <play-conf-box @change-chord="onChangeChord" />
     </div>
-    <play-conf-box @change-chord="onChangeChord" />
-  </div>
+  </v-app>
 </template>
 
 <script>

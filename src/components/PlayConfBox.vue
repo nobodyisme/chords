@@ -1,30 +1,44 @@
 <template>
-  <div class="play-conf-box"></div>
+  <div class="play-conf-box">
+    <v-card-text>
+      <v-row class="mb-4" justify="space-between">
+        <v-col class="text-left">
+          <span class="subheading font-weight-light mr-1">
+            Chord change interval:
+          </span>
+        </v-col>
+      </v-row>
+
+      <v-row class="mb-4" justify="space-between">
+        <v-col>
+          <v-slider
+            v-model="interval"
+            :color="color"
+            track-color="grey"
+            always-dirty
+            thumb-label="always"
+            :thumb-size="28"
+            :thumb-color="thumbcolor"
+            min="1"
+            max="60"
+          >
+            <template v-slot:thumb-label="{ value }"> {{ value }}s </template>
+
+            <template v-slot:prepend>
+              <v-icon :color="color" @click="decrement"> mdi-minus </v-icon>
+            </template>
+
+            <template v-slot:append>
+              <v-icon :color="color" @click="increment"> mdi-plus </v-icon>
+            </template>
+          </v-slider>
+        </v-col>
+      </v-row>
+    </v-card-text>
+  </div>
 </template>
 
 <script>
-function changeChord(self) {
-  console.log("change chord");
-  console.log(self);
-
-  var index = Math.floor(Math.random() * chords.length);
-
-  console.log("emitting");
-  self.$emit("change-chord", chords[index]);
-}
-
-function scheduleChangeChord(self) {
-  changeChord(self);
-  setTimeout(
-    (function (self) {
-      return function () {
-        scheduleChangeChord(self);
-      };
-    })(self),
-    5000
-  );
-}
-
 let chords = ["A", "B", "C"];
 
 export default {
