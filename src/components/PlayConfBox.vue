@@ -46,8 +46,51 @@ export default {
   emits: ["change-chord"],
   mounted: function () {
     this.$nextTick(function () {
-      scheduleChangeChord(this);
+      this.change_scheduler = setInterval(this.change_chord_task, 200);
     });
+  },
+  data: () => ({
+    interval: 10,
+    change_scheduler: undefined,
+    last_chord_change_ts: undefined,
+  }),
+  computed: {
+    color() {
+      return "indigo";
+    },
+    thumbcolor() {
+      return "#3E497A";
+    },
+  },
+  methods: {
+    change_chord_task() {
+      let cur_time = Date.now();
+
+      let early =
+        this.last_chord_change_ts != undefined &&
+        cur_time - this.last_chord_change_ts < this.interval * 1000;
+
+      if (early) {
+        return;
+      }
+
+      this.change_chord();
+      this.last_chord_change_ts = cur_time;
+    },
+    change_chord() {
+      console.log("change chord");
+
+      var index = Math.floor(Math.random() * chords.length);
+
+      console.log("emitting");
+      this.$emit("change-chord", chords[index]);
+    },
+    decrement() {
+      this.interval--;
+    },
+    increment() {
+      this.interval++;
+    },
   },
 };
 </script>
@@ -55,6 +98,5 @@ export default {
 <style lang="scss" scoped>
 .play-conf-box {
   grid-area: conf2;
-  background-color: red;
 }
 </style>
