@@ -3,9 +3,7 @@
     <v-card-text>
       <v-row class="mb-4" justify="space-between">
         <v-col class="text-left">
-          <span class="subheading font-weight-light mr-1">
-            Chord change interval:
-          </span>
+          <span class="text-overline">Chord change interval</span>
         </v-col>
       </v-row>
 
