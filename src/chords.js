@@ -1,8 +1,3 @@
-<template>
-  <chords-type-item :label="chord_types_tree.label" :id="chord_types_tree.id" />
-</template>
-
-<script>
 const notes = {
   C: { s: "C", next: {} },
   D: { s: "D", next: {} },
@@ -32,6 +27,43 @@ const accidentals = {
 const accidentalMap = {};
 for (let idx in accidentals) {
   accidentalMap[accidentals[idx].distance] = accidentals[idx];
+}
+
+// eslint-disable-next-line no-unused-vars
+function BuildChord(start_note, start_accidental, intervals) {
+  let cur_degree = 1;
+  let cur_distance = -start_accidental.distance;
+  let cur_note = start_note;
+
+  let chord = [];
+
+  for (let interval of intervals) {
+    while (cur_degree != interval.degree) {
+      cur_distance += cur_note.next.distance;
+      cur_degree += 1;
+      cur_note = cur_note.next.note;
+    }
+    // output *note*
+    let accidental = accidentalMap[interval.distance - cur_distance];
+    if (accidental == undefined) {
+      throw "Unsupported chord configuration: " + arguments;
+    }
+    chord.push({
+      note: cur_note,
+      accidental: accidental,
+    });
+  }
+
+  return chord;
+}
+
+// eslint-disable-next-line no-unused-vars
+function PrintChord(chord) {
+  let notes = [];
+  for (let n of chord) {
+    notes.push(n.note.s + n.accidental.s);
+  }
+  return notes.join(" ");
 }
 
 const intervals = {
@@ -77,154 +109,78 @@ const intervals = {
   // TODO: add intervals larger than one octave
 };
 
-// eslint-disable-next-line no-unused-vars
-function BuildChord(start_note, start_accidental, intervals) {
-  let cur_degree = 1;
-  let cur_distance = -start_accidental.distance;
-  let cur_note = start_note;
+export const chord_type_ids = {
+  major_triad: "major_triad",
+  minor_triad: "minor_triad",
+  augmented_triad: "augmented_triad",
+  diminished_triad: "diminished_triad",
 
-  let chord = [];
-
-  for (let interval of intervals) {
-    while (cur_degree != interval.degree) {
-      cur_distance += cur_note.next.distance;
-      cur_degree += 1;
-      cur_note = cur_note.next.note;
-    }
-    // output *note*
-    let accidental = accidentalMap[interval.distance - cur_distance];
-    if (accidental == undefined) {
-      throw "Unsupported chord configuration: " + arguments;
-    }
-    chord.push({
-      note: cur_note,
-      accidental: accidental,
-    });
-  }
-
-  return chord;
+  diminished_seventh: "diminished_seventh",
+  half_diminished_seventh: "half_diminished_seventh",
+  minor_seventh: "minor_seventh",
+  minor_major_seventh: "minor_major_seventh",
+  dominant_seventh: "dominant_seventh",
+  major_seventh: "major_seventh",
+  augmented_seventh: "augmented_seventh",
+  augmented_major_seventh: "augmented_major_seventh",
 }
 
+
+// eslint-disable-next-line no-unused-vars
 const chord_types = {
   // Triads
-  major_triad: {
+  [chord_type_ids.major_triad]: {
     s_variants: ["", "M", "Δ", "ma"],
     intervals: [intervals.P1, intervals.M3, intervals.P5],
   },
-  minor_triad: {
+  [chord_type_ids.minor_triad]: {
     s_variants: ["m", "min", "-", "mi"],
     intervals: [intervals.P1, intervals.m3, intervals.P5],
   },
-  augmented_triad: {
+  [chord_type_ids.augmented_triad]: {
     s_variants: ["⁺", "+", "aug"],
     intervals: [intervals.P1, intervals.M3, intervals.A5],
   },
-  diminished_triad: {
+  [chord_type_ids.diminished_triad]: {
     // TODO: move to superscript (♭5)
-    s_variants: ["⁰", "dim", "⁽ᵇ⁵⁾"],
+    s_variants: ["ᵒ", "dim", "⁽ᵇ⁵⁾"],
     intervals: [intervals.P1, intervals.m3, intervals.d5],
   },
 
   // Seventh
-  diminished_seventh: {
+  [chord_type_ids.diminished_seventh]: {
     s_variants: ["ᵒ⁷", "dim⁷"],
     intervals: [intervals.P1, intervals.m3, intervals.d5, intervals.d7],
   },
-  half_diminished_seventh: {
+  [chord_type_ids.half_diminished_seventh]: {
     // TODO: change to superscript 'ø⁷'
     s_variants: ["ø⁷", "m⁷ᵇ⁵", "-⁽ᵇ⁵⁾"],
     intervals: [intervals.P1, intervals.m3, intervals.d5, intervals.m7],
   },
-  minor_seventh: {
+  [chord_type_ids.minor_seventh]: {
     s_variants: ["m⁷", "min⁷", "-⁷"],
     intervals: [intervals.P1, intervals.m3, intervals.P5, intervals.m7],
   },
-  minor_major_seventh: {
+  [chord_type_ids.minor_major_seventh]: {
     s_variants: ["mᴹ⁷", "mᵐᵃʲ⁷", "-⁽ʲ⁷⁾", "-ᐞ⁷", "-ᴹ⁷"],
     intervals: [intervals.P1, intervals.m3, intervals.P5, intervals.M7],
   },
-  dominant_seventh: {
+  [chord_type_ids.dominant_seventh]: {
     s_variants: ["⁷", "dom⁷"],
     intervals: [intervals.P1, intervals.M3, intervals.P5, intervals.m7],
   },
-  major_seventh: {
+  [chord_type_ids.major_seventh]: {
     s_variants: ["M⁷", "ᴹ⁷", "ᵐᵃʲ⁷", "ᐞ⁷", "ʲ⁷"],
     intervals: [intervals.P1, intervals.M3, intervals.P5, intervals.M7],
   },
-  augmented_seventh: {
+  [chord_type_ids.augmented_seventh]: {
     // TODO: proper subscript ♯
     s_variants: ["+⁷", "aug⁷", "⁷⁺", "⁷⁺⁵", "⁷♯⁵"],
     intervals: [intervals.P1, intervals.M3, intervals.A5, intervals.m7],
   },
-  augmented_major_seventh: {
+  [chord_type_ids.augmented_major_seventh]: {
     // TODO: proper subscript ♯
     s_variants: ["+ᴹ⁷", "ᴹ⁷⁺⁵", "ᴹ⁷♯⁵", "+ʲ⁷", "+ᐞ⁷"],
     intervals: [intervals.P1, intervals.M3, intervals.A5, intervals.M7],
   },
 };
-
-let chord_types_tree = {
-  label: "chord types",
-  elements: [
-    {
-      label: "thirds",
-      elements: [
-        {
-          label: "basic",
-          elements: [chord_types.major_triad, chord_types.minor_triad],
-        },
-        {
-          label: "more",
-          elements: [chord_types.diminished_triad, chord_types.augmented_triad],
-        },
-      ],
-    },
-    {
-      label: "sevenths",
-      elements: [
-        {
-          label: "basic",
-          elements: [
-            chord_types.major_seventh,
-            chord_types.minor_seventh,
-            chord_types.dominant_seventh,
-          ],
-        },
-        {
-          label: "more",
-          elements: [
-            chord_types.diminished_seventh,
-            chord_types.half_diminished_seventh,
-            chord_types.minor_major_seventh,
-            chord_types.augmented_seventh,
-            chord_types.augmented_major_seventh,
-          ],
-        },
-      ],
-    },
-  ],
-};
-
-// eslint-disable-next-line no-unused-vars
-function PrintChord(chord) {
-  let notes = [];
-  for (let n of chord) {
-    notes.push(n.note.s + n.accidental.s);
-  }
-  return notes.join(" ");
-}
-
-import ChordsTypeItem from "./ChordTypeItem.vue";
-
-export default {
-  name: "ChordsSelector",
-  data: function () {
-    return {
-      chord_types_tree: chord_types_tree,
-    };
-  },
-  components: {
-    ChordsTypeItem,
-  },
-};
-</script>

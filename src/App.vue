@@ -2,13 +2,7 @@
   <v-app>
     <div class="app">
       <play-box :chord="chord" />
-      <div class="chords-conf-box">
-        <ul>
-          <li>one</li>
-          <li>two</li>
-          <li>three</li>
-        </ul>
-      </div>
+      <chords-selector-box @chords-setup="onChordsSetup" />
       <play-conf-box @change-chord="onChangeChord" />
     </div>
   </v-app>
@@ -17,22 +11,38 @@
 <script>
 import PlayBox from "./components/PlayBox.vue";
 import PlayConfBox from "./components/PlayConfBox.vue";
+import ChordsSelectorBox from "./components/ChordsSelectorBox.vue";
 
 export default {
   name: "App",
 
   components: {
+    ChordsSelectorBox,
     PlayBox,
     PlayConfBox,
   },
 
   data: () => ({
     chord: "some chord",
+    chord_types: [],
+    inversions: false,
   }),
 
   methods: {
-    onChangeChord(newChord) {
-      this.chord = newChord;
+    onChangeChord() {
+      let chords = ["A", "B", "C"];
+      console.log("change chord");
+
+      var index = Math.floor(Math.random() * chords.length);
+
+      console.log("emitting");
+      this.chord = chords[index];
+    },
+    onChordsSetup(chord_types, inversions) {
+      console.log(chord_types);
+      console.log(inversions);
+      this.chord_types = chord_types;
+      this.inversions = inversions;
     },
   },
 };
@@ -66,10 +76,5 @@ body {
       "main conf1"
       "main conf2";
   }
-}
-
-.chords-conf-box {
-  grid-area: conf1;
-  background-color: hotpink;
 }
 </style>

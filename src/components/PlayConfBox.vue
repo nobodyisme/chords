@@ -39,8 +39,6 @@
 </template>
 
 <script>
-let chords = ["A", "B", "C"];
-
 export default {
   name: "PlayConfBox",
   emits: ["change-chord"],
@@ -78,12 +76,7 @@ export default {
       this.last_chord_change_ts = cur_time;
     },
     change_chord() {
-      console.log("change chord");
-
-      var index = Math.floor(Math.random() * chords.length);
-
-      console.log("emitting");
-      this.$emit("change-chord", chords[index]);
+      this.$emit("change-chord");
     },
     decrement() {
       this.interval--;
