@@ -29,7 +29,6 @@ for (let idx in accidentals) {
   accidentalMap[accidentals[idx].distance] = accidentals[idx];
 }
 
-// eslint-disable-next-line no-unused-vars
 function BuildChord(start_note, start_accidental, intervals) {
   let cur_degree = 1;
   let cur_distance = -start_accidental.distance;
@@ -130,18 +129,22 @@ export const chord_type_ids = {
 const chord_types = {
   // Triads
   [chord_type_ids.major_triad]: {
+    id: chord_type_ids.major_triad,
     s_variants: ["", "M", "Δ", "ma"],
     intervals: [intervals.P1, intervals.M3, intervals.P5],
   },
   [chord_type_ids.minor_triad]: {
+    id: chord_type_ids.minor_triad,
     s_variants: ["m", "min", "-", "mi"],
     intervals: [intervals.P1, intervals.m3, intervals.P5],
   },
   [chord_type_ids.augmented_triad]: {
+    id: chord_type_ids.augmented_triad,
     s_variants: ["⁺", "+", "aug"],
     intervals: [intervals.P1, intervals.M3, intervals.A5],
   },
   [chord_type_ids.diminished_triad]: {
+    id: chord_type_ids.diminished_triad,
     // TODO: move to superscript (♭5)
     s_variants: ["ᵒ", "dim", "⁽ᵇ⁵⁾"],
     intervals: [intervals.P1, intervals.m3, intervals.d5],
@@ -149,38 +152,134 @@ const chord_types = {
 
   // Seventh
   [chord_type_ids.diminished_seventh]: {
+    id: chord_type_ids.diminished_seventh,
     s_variants: ["ᵒ⁷", "dim⁷"],
     intervals: [intervals.P1, intervals.m3, intervals.d5, intervals.d7],
   },
   [chord_type_ids.half_diminished_seventh]: {
+    id: chord_type_ids.half_diminished_seventh,
     // TODO: change to superscript 'ø⁷'
     s_variants: ["ø⁷", "m⁷ᵇ⁵", "-⁽ᵇ⁵⁾"],
     intervals: [intervals.P1, intervals.m3, intervals.d5, intervals.m7],
   },
   [chord_type_ids.minor_seventh]: {
+    id: chord_type_ids.minor_seventh,
     s_variants: ["m⁷", "min⁷", "-⁷"],
     intervals: [intervals.P1, intervals.m3, intervals.P5, intervals.m7],
   },
   [chord_type_ids.minor_major_seventh]: {
+    id: chord_type_ids.minor_major_seventh,
     s_variants: ["mᴹ⁷", "mᵐᵃʲ⁷", "-⁽ʲ⁷⁾", "-ᐞ⁷", "-ᴹ⁷"],
     intervals: [intervals.P1, intervals.m3, intervals.P5, intervals.M7],
   },
   [chord_type_ids.dominant_seventh]: {
+    id: chord_type_ids.dominant_seventh,
     s_variants: ["⁷", "dom⁷"],
     intervals: [intervals.P1, intervals.M3, intervals.P5, intervals.m7],
   },
   [chord_type_ids.major_seventh]: {
+    id: chord_type_ids.major_seventh,
     s_variants: ["M⁷", "ᴹ⁷", "ᵐᵃʲ⁷", "ᐞ⁷", "ʲ⁷"],
     intervals: [intervals.P1, intervals.M3, intervals.P5, intervals.M7],
   },
   [chord_type_ids.augmented_seventh]: {
+    id: chord_type_ids.augmented_seventh,
     // TODO: proper subscript ♯
     s_variants: ["+⁷", "aug⁷", "⁷⁺", "⁷⁺⁵", "⁷♯⁵"],
     intervals: [intervals.P1, intervals.M3, intervals.A5, intervals.m7],
   },
   [chord_type_ids.augmented_major_seventh]: {
+    id: chord_type_ids.augmented_major_seventh,
     // TODO: proper subscript ♯
     s_variants: ["+ᴹ⁷", "ᴹ⁷⁺⁵", "ᴹ⁷♯⁵", "+ʲ⁷", "+ᐞ⁷"],
     intervals: [intervals.P1, intervals.M3, intervals.A5, intervals.M7],
   },
 };
+
+
+const skip_root_notes = [
+  { note: notes.C, accidental: accidentals.flat },
+  { note: notes.B, accidental: accidentals.sharp },
+  { note: notes.E, accidental: accidentals.sharp },
+  { note: notes.F, accidental: accidentals.flat },
+]
+let root_notes = [];
+
+function fill_root_nodes() {
+  let root_notes_accidentals = [accidentals.flat, accidentals.natural, accidentals.sharp]
+  for (let note in notes) {
+    for (let accidental of root_notes_accidentals) {
+      let root_note = { note: notes[note], accidental: accidental }
+
+      let skip = false
+      for (let n of skip_root_notes) {
+        if (n.note.s == root_note.note.s && n.accidental.s == root_note.accidental.s) {
+          skip = true
+          break
+        }
+      }
+
+      if (skip) {
+        continue
+      }
+      root_notes.push(root_note);
+    }
+  }
+}
+
+fill_root_nodes()
+
+function randomChoice(arr) {
+  return arr[Math.floor(arr.length * Math.random())];
+}
+
+function chordsEqual(chord1, chord2) {
+  function cmpobj(chord) {
+    return {
+      root_note: chord.notes[0].note.s,
+      chord_type: chord.chord_type.id,
+      inversion: chord.inversion,
+    }
+  }
+  return JSON.stringify(cmpobj(chord1)) === JSON.stringify(cmpobj(chord2))
+}
+
+export function randomChord(chord_type_ids, exclude_chord, inversions_enabled) {
+  let chord = {}
+  do {
+    let root_note = randomChoice(root_notes)
+    let chord_type_id = randomChoice(chord_type_ids)
+    let chord_notes = BuildChord(root_note.note, root_note.accidental, chord_types[chord_type_id].intervals)
+
+    let chord_type = chord_types[chord_type_id]
+    let inversion_max = inversions_enabled ? chord_type.intervals.length : 1
+
+    chord = {
+      notes: chord_notes,
+      chord_type: chord_type,
+      inversion: Math.floor(inversion_max * Math.random()),
+    }
+  } while (exclude_chord != null && chordsEqual(chord, exclude_chord))
+  return chord
+}
+
+export function renderChord(chord) {
+  let res = [];
+  res.push(chord.notes[0].note.s)
+  if (chord.notes[0].accidental != accidentals.natural) {
+    res.push(chord.notes[0].accidental.s)
+  }
+
+  res.push(chord.chord_type.s_variants[0])
+
+  if (chord.inversion > 0) {
+    res.push('/')
+    let root = chord.notes[chord.inversion]
+    res.push(root.note.s)
+    if (root.accidental != accidentals.natural) {
+      res.push(root.accidental.s)
+    }
+  }
+
+  return res.join("")
+}

@@ -1,56 +1,76 @@
 <template>
   <div class="chords-conf-box">
-    <span class="text-overline">Triads</span>
-    <v-chip-group
-      multiple
-      column
-      active-class="primary--text"
-      v-model="selected_triads"
-      @change="updateChordTypes"
-    >
-      <v-chip
-        v-for="triad in chord_types.triads"
-        :key="triad.id"
-        :value="triad.id"
-        filter
-        small
-        filter-icon="mdi-check-bold"
-      >
-        {{ triad.label }}
-      </v-chip>
-    </v-chip-group>
+    <v-card-text>
+      <v-row class="mb-1 mt-1" justify="space-between">
+        <v-col class="text-left pb-1 pt-1">
+          <span class="text-overline">Triads</span>
+          <v-chip-group
+            multiple
+            column
+            active-class="primary--text"
+            v-model="selected_triads"
+            @change="updateChordTypes"
+          >
+            <v-chip
+              v-for="triad in chord_types.triads"
+              :key="triad.id"
+              :value="triad.id"
+              filter
+              small
+              filter-icon="mdi-check-bold"
+            >
+              {{ triad.label }}
+            </v-chip>
+          </v-chip-group>
+        </v-col>
+      </v-row>
 
-    <span class="text-overline">Sevenths</span>
-    <v-chip-group
-      multiple
-      column
-      active-class="primary--text"
-      v-model="selected_sevenths"
-      @change="updateChordTypes"
-    >
-      <v-chip
-        v-for="seventh in chord_types.sevenths"
-        :key="seventh.id"
-        :value="seventh.id"
-        filter
-        small
-        filter-icon="mdi-check-bold"
-      >
-        {{ seventh.label }}
-      </v-chip>
-    </v-chip-group>
-    <span class="text-overline">Options</span>
-    <v-chip-group
-      multiple
-      column
-      active-class="primary--text"
-      v-model="selected_options"
-      @change="updateChordTypes"
-    >
-      <v-chip filter small :value="inversions_id" filter-icon="mdi-check-bold">
-        inversions
-      </v-chip>
-    </v-chip-group>
+      <v-row class="mb-1 mt-1" justify="space-between">
+        <v-col class="pb-1 pt-1">
+          <span class="text-overline">Sevenths</span>
+          <v-chip-group
+            multiple
+            column
+            active-class="primary--text"
+            v-model="selected_sevenths"
+            @change="updateChordTypes"
+          >
+            <v-chip
+              v-for="seventh in chord_types.sevenths"
+              :key="seventh.id"
+              :value="seventh.id"
+              filter
+              small
+              filter-icon="mdi-check-bold"
+            >
+              {{ seventh.label }}
+            </v-chip>
+          </v-chip-group>
+        </v-col>
+      </v-row>
+
+      <v-row class="mb-1 mt-1" justify="space-between">
+        <v-col class="pb-1 pt-1">
+          <span class="text-overline">Options</span>
+          <v-chip-group
+            multiple
+            column
+            active-class="primary--text"
+            v-model="selected_options"
+            @change="updateChordTypes"
+          >
+            <v-chip
+              filter
+              small
+              :value="inversions_id"
+              filter-icon="mdi-check-bold"
+            >
+              inversions
+            </v-chip>
+          </v-chip-group>
+        </v-col>
+      </v-row>
+    </v-card-text>
   </div>
 </template>
 
@@ -93,6 +113,18 @@ export default {
       }
     },
   },
+  props: ["init_chord_types", "init_inversions"],
+  mounted: function () {
+    this.$nextTick(function () {
+      for (let name in this.chord_types) {
+        for (let chord_type of this.chord_types[name])
+          if (this.init_chord_types.indexOf(chord_type.id) != -1) {
+            chord_type.selected = true;
+          }
+      }
+      this.inversions = this.init_inversions;
+    });
+  },
   data: function () {
     return {
       inversions_id: "inversions",
@@ -100,13 +132,13 @@ export default {
       chord_types: {
         triads: [
           { id: chord_type_ids.major_triad, label: "M", selected: false },
-          { id: chord_type_ids.minor_triad, label: "m", selected: true },
+          { id: chord_type_ids.minor_triad, label: "m", selected: false },
           { id: chord_type_ids.diminished_triad, label: "o", selected: false },
           { id: chord_type_ids.augmented_triad, label: "+", selected: false },
         ],
         sevenths: [
           { id: chord_type_ids.major_seventh, label: "M7", selected: false },
-          { id: chord_type_ids.minor_seventh, label: "m7", selected: true },
+          { id: chord_type_ids.minor_seventh, label: "m7", selected: false },
           { id: chord_type_ids.dominant_seventh, label: "7", selected: false },
           {
             id: chord_type_ids.diminished_seventh,
@@ -143,7 +175,6 @@ export default {
         return this.getSelectedChordTypes(this.chord_types.triads);
       },
       set: function (selected) {
-        console.log(selected);
         return this.setSelectedChordTypes(this.chord_types.triads, selected);
       },
     },

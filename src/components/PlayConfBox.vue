@@ -1,14 +1,14 @@
 <template>
   <div class="play-conf-box">
     <v-card-text>
-      <v-row class="mb-4" justify="space-between">
-        <v-col class="text-left">
+      <v-row class="mb-2 mt-1" justify="space-between">
+        <v-col class="text-left pb-1 pt-1">
           <span class="text-overline">Chord change interval</span>
         </v-col>
       </v-row>
 
-      <v-row class="mb-4" justify="space-between">
-        <v-col>
+      <v-row class="mb-1 mt-3" justify="space-between">
+        <v-col class="pb-1 pt-3">
           <v-slider
             v-model="interval"
             :color="color"
@@ -39,17 +39,25 @@
 <script>
 export default {
   name: "PlayConfBox",
-  emits: ["change-chord"],
+  emits: ["change-chord", "update-chord-change-interval"],
   mounted: function () {
     this.$nextTick(function () {
       this.change_scheduler = setInterval(this.change_chord_task, 200);
     });
   },
-  data: () => ({
-    interval: 10,
-    change_scheduler: undefined,
-    last_chord_change_ts: undefined,
-  }),
+  props: ["init_chord_change_interval"],
+  data: function () {
+    return {
+      interval: this.init_chord_change_interval,
+      change_scheduler: undefined,
+      last_chord_change_ts: undefined,
+    };
+  },
+  watch: {
+    interval(val) {
+      this.$emit("update-chord-change-interval", val);
+    },
+  },
   computed: {
     color() {
       return "indigo";
