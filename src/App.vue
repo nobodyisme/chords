@@ -33,7 +33,7 @@ export default {
   },
 
   data: () => ({
-    chord: "some chord",
+    chord: "",
     chord_types: [],
     chord_change_interval: 5,
     inversions: false,
