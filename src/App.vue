@@ -21,7 +21,7 @@ import PlayBox from "./components/PlayBox.vue";
 import PlayConfBox from "./components/PlayConfBox.vue";
 import ChordsSelectorBox from "./components/ChordsSelectorBox.vue";
 
-import { randomChord, renderChord } from "./chords";
+import { chord_type_ids, randomChord, renderChord } from "./chords";
 
 export default {
   name: "App",
@@ -88,7 +88,17 @@ export default {
   },
 
   created: function () {
-    this.chord_types = this.parseLocalStorageValue("chord_types", []);
+    let default_chord_types = [
+      chord_type_ids.major_triad,
+      chord_type_ids.minor_triad,
+    ];
+    this.chord_types = this.parseLocalStorageValue(
+      "chord_types",
+      default_chord_types
+    );
+    if (this.chord_types.length == 0) {
+      this.chord_types = default_chord_types;
+    }
     this.inversions = this.parseLocalStorageValue("inversions", false);
     this.chord_change_interval = this.parseLocalStorageValue(
       "chord_change_interval",
