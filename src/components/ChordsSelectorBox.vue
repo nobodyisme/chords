@@ -67,6 +67,15 @@
             >
               inversions
             </v-chip>
+
+            <v-chip
+              filter
+              small
+              :value="enharmonic_notes_chords_id"
+              filter-icon="mdi-check-bold"
+            >
+              enharmonic notes chords
+            </v-chip>
           </v-chip-group>
         </v-col>
       </v-row>
@@ -88,7 +97,12 @@ export default {
             chord_type_ids.push(chord_type.id);
           }
       }
-      this.$emit("chords-setup", chord_type_ids, this.inversions);
+      this.$emit(
+        "chords-setup",
+        chord_type_ids,
+        this.inversions,
+        this.enharmonic_notes_chords
+      );
     },
     getSelectedChordTypes(chord_family) {
       let res = [];
@@ -113,7 +127,11 @@ export default {
       }
     },
   },
-  props: ["init_chord_types", "init_inversions"],
+  props: [
+    "init_chord_types",
+    "init_inversions",
+    "init_enharmonic_notes_chords",
+  ],
   mounted: function () {
     this.$nextTick(function () {
       for (let name in this.chord_types) {
@@ -123,12 +141,15 @@ export default {
           }
       }
       this.inversions = this.init_inversions;
+      this.enharmonic_notes_chords = this.init_enharmonic_notes_chords;
     });
   },
   data: function () {
     return {
       inversions_id: "inversions",
+      enharmonic_notes_chords_id: "enharmonic_notes_chords",
       inversions: false,
+      enharmonic_notes_chords: false,
       chord_types: {
         triads: [
           { id: chord_type_ids.major_triad, label: "M", selected: false },
@@ -194,14 +215,26 @@ export default {
         if (this.inversions) {
           options.push(this.inversions_id);
         }
+        if (this.enharmonic_notes_chords) {
+          options.push(this.enharmonic_notes_chords_id);
+        }
         return options;
       },
       set: function (selected) {
+        // toggle inversions
         let found = selected.indexOf(this.inversions_id) != -1;
         if (found && !this.inversions) {
           this.inversions = true;
         } else if (!found && this.inversions) {
           this.inversions = false;
+        }
+
+        // toggle enharmonic notes chords
+        found = selected.indexOf(this.enharmonic_notes_chords_id) != -1;
+        if (found && !this.enharmonic_notes_chords) {
+          this.enharmonic_notes_chords = true;
+        } else if (!found && this.enharmonic_notes_chords) {
+          this.enharmonic_notes_chords = false;
         }
       },
     },

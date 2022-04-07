@@ -6,6 +6,7 @@
         @chords-setup="onChordsSetup"
         :init_chord_types="chord_types"
         :init_inversions="inversions"
+        :init_enharmonic_notes_chords="enharmonic_notes_chords"
       />
       <play-conf-box
         @change-chord="onChangeChord"
@@ -37,6 +38,7 @@ export default {
     chord_types: [],
     chord_change_interval: 5,
     inversions: false,
+    enharmonic_notes_chords: false,
     current_chord: null,
   }),
 
@@ -48,16 +50,18 @@ export default {
       this.current_chord = randomChord(
         this.chord_types,
         this.current_chord,
-        this.inversions
+        this.inversions,
+        this.enharmonic_notes_chords
       );
       this.chord = renderChord(this.current_chord);
     },
     onUpdateChordChangeInterval(val) {
       localStorage.setItem("chord_change_interval", JSON.stringify(val));
     },
-    onChordsSetup(chord_types, inversions) {
+    onChordsSetup(chord_types, inversions, enharmonic_notes_chords) {
       this.chord_types = chord_types;
       this.inversions = inversions;
+      this.enharmonic_notes_chords = enharmonic_notes_chords;
     },
     parseLocalStorageValue(key, default_val) {
       let raw_val = localStorage.getItem(key);
@@ -85,6 +89,9 @@ export default {
     inversions(val) {
       localStorage.setItem("inversions", JSON.stringify(val));
     },
+    enharmonic_notes_chords(val) {
+      localStorage.setItem("enharmonic_notes_chords", JSON.stringify(val));
+    },
   },
 
   created: function () {
@@ -100,6 +107,10 @@ export default {
       this.chord_types = default_chord_types;
     }
     this.inversions = this.parseLocalStorageValue("inversions", false);
+    this.enharmonic_notes_chords = this.parseLocalStorageValue(
+      "enharmonic_notes_chords",
+      false
+    );
     this.chord_change_interval = this.parseLocalStorageValue(
       "chord_change_interval",
       10

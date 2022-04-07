@@ -197,7 +197,7 @@ const chord_types = {
 };
 
 
-const skip_root_notes = [
+const skip_notes = [
   { note: notes.C, accidental: accidentals.flat },
   { note: notes.B, accidental: accidentals.sharp },
   { note: notes.E, accidental: accidentals.sharp },
@@ -205,23 +205,25 @@ const skip_root_notes = [
 ]
 let root_notes = [];
 
+function is_enharmonic_notes_chord(chord) {
+  for (let note of chord.notes) {
+    for (let skip_note of skip_notes) {
+      if (note.note.s == skip_note.note.s && note.accidental.s == skip_note.accidental.s) {
+        return true;
+      }
+    }
+
+    if (note.accidental == accidentals.doubleflat) { return true }
+    if (note.accidental == accidentals.doublesharp) { return true }
+  }
+  return false;
+}
+
 function fill_root_nodes() {
   let root_notes_accidentals = [accidentals.flat, accidentals.natural, accidentals.sharp]
   for (let note in notes) {
     for (let accidental of root_notes_accidentals) {
       let root_note = { note: notes[note], accidental: accidental }
-
-      let skip = false
-      for (let n of skip_root_notes) {
-        if (n.note.s == root_note.note.s && n.accidental.s == root_note.accidental.s) {
-          skip = true
-          break
-        }
-      }
-
-      if (skip) {
-        continue
-      }
       root_notes.push(root_note);
     }
   }
@@ -244,8 +246,8 @@ function chordsEqual(chord1, chord2) {
   return JSON.stringify(cmpobj(chord1)) === JSON.stringify(cmpobj(chord2))
 }
 
-export function randomChord(chord_type_ids, exclude_chord, inversions_enabled) {
-  let chord = {}
+export function randomChord(chord_type_ids, exclude_chord, inversions_enabled, enharmonic_notes_chords_enabled) {
+  let chord = null
   do {
     let root_note = randomChoice(root_notes)
     let chord_type_id = randomChoice(chord_type_ids)
@@ -259,7 +261,11 @@ export function randomChord(chord_type_ids, exclude_chord, inversions_enabled) {
       chord_type: chord_type,
       inversion: Math.floor(inversion_max * Math.random()),
     }
-  } while (exclude_chord != null && chordsEqual(chord, exclude_chord))
+
+    if (!enharmonic_notes_chords_enabled && is_enharmonic_notes_chord(chord)) {
+      chord = null
+    }
+  } while (chord == null || (exclude_chord != null && chordsEqual(chord, exclude_chord)))
   return chord
 }
 
